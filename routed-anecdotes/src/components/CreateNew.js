@@ -8,6 +8,12 @@ const CreateNew = (props) => {
     const info = useField('text')
     const navigate = useNavigate()
   
+    const resetFields = () => {
+      content.onChange({ target: { value: '' } })
+      author.onChange({ target: { value: '' } })
+      info.onChange({ target: { value: '' } })
+    }
+  
     const handleSubmit = (e) => {
       e.preventDefault()
       props.addNew({
@@ -22,6 +28,7 @@ const CreateNew = (props) => {
         props.setNotification('')
       }, 5000)
     }
+    
   
     return (
       <div>
@@ -39,7 +46,8 @@ const CreateNew = (props) => {
             url for more info
             <input name='info' {...info} />
           </div>
-          <button>create</button>
+          <button type='submit'>submit</button>
+          <button type='reset' onClick={resetFields}>reset</button>
         </form>
       </div>
     )
