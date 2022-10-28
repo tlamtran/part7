@@ -11,11 +11,14 @@ import Users from "./components/Users";
 
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import userServices from "./services/users";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setBlogs, addBlog, removeBlog, like } from "./reducers/blogReducer";
 import { setUser } from "./reducers/userReducer";
+import { setUsers } from "./reducers/usersReducer";
 import { setMessage } from "./reducers/notificationReducer";
+import User from "./components/User";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -30,6 +33,7 @@ const App = () => {
       .then((blogs) =>
         dispatch(setBlogs(blogs.sort((a, b) => b.likes - a.likes)))
       );
+    userServices.getAll().then((users) => dispatch(setUsers(users)));
   }, [dispatch]);
 
   useEffect(() => {
@@ -127,8 +131,8 @@ const App = () => {
           {user.name} logged in <button onClick={handleLogout}>logout</button>
         </p>
       </div>
-    )
-  }
+    );
+  };
 
   const Login = () => {
     return (
@@ -147,6 +151,7 @@ const App = () => {
       </div>
       <div>
         <Routes>
+          <Route path="/users/:id" element={<User />} />
           <Route
             path="/"
             element={user ? <Home /> : <Navigate replace to="/login" />}
