@@ -1,35 +1,32 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 
-const Blog = ({ blog, user, handleLike, handleRemove }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
+const blogStyle = {
+  paddingTop: 10,
+  paddingLeft: 2,
+  border: "solid",
+  borderWidth: 1,
+  marginBottom: 5,
+};
 
-  const [likes, setLikes] = useState(blog.likes);
+const Blog = ({ blog, handleLike, handleRemove }) => {
   const [visible, setVisible] = useState(false);
 
   const showIfTrue = { display: visible ? "" : "none" };
   const showRemoveButton = {
-    display: user.name === blog.user.name ? "" : "none",
+    display: blog.user.name === blog.user.name ? "" : "none",
   };
 
   const toggleVisibility = () => {
     setVisible(!visible);
   };
 
-  const like = () => {
-    setLikes(likes + 1);
-    blog.likes = likes;
-    handleLike(blog);
+  const incrementLike = () => {
+    handleLike(blog)
   };
 
   const remove = async () => {
-    handleRemove(blog);
+    handleRemove(blog)
   };
 
   return (
@@ -43,8 +40,8 @@ const Blog = ({ blog, user, handleLike, handleRemove }) => {
       <div style={showIfTrue} className="hiddenContent">
         <div>{blog.url}</div>
         <div>
-          likes {likes}
-          <button onClick={like} className="likeButton">
+          likes {blog.likes}
+          <button onClick={incrementLike} className="likeButton">
             like
           </button>
         </div>
@@ -59,9 +56,6 @@ const Blog = ({ blog, user, handleLike, handleRemove }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
-  blogs: PropTypes.array.isRequired,
-  setBlogs: PropTypes.func.isRequired,
 };
 
 export default Blog;

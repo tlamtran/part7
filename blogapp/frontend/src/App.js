@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import Blog from "./components/Blog";
+import { useEffect, useRef } from "react";
+import Blogs from "./components/Blogs";
 import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
@@ -7,36 +7,42 @@ import Toggleable from "./components/Toggleable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
+import { useDispatch, useSelector } from "react-redux";
+import { setBlogs, addBlog, removeBlog, like } from "./reducers/blogReducer";
+import { setUser } from "./reducers/userReducer";
+import { setMessage } from "./reducers/notificationReducer";
+
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [user, setUser] = useState(null);
-  const [message, setMessage] = useState(null);
-  const [messageStyle, setMessageStyle] = useState("");
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const blogFormRef = useRef();
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    blogService
+      .getAll()
+      .then((blogs) =>
+        dispatch(setBlogs(blogs.sort((a, b) => b.likes - a.likes)))
+      );
+  }, [dispatch]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedUser");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       blogService.setToken(user.token);
-      setUser(user);
+      dispatch(setUser(user));
     }
   }, []);
 
   const handleLogout = () => {
     window.localStorage.clear();
     blogService.setToken(null);
-    setUser(null);
+    dispatch(setUser(null));
 
-    setMessageStyle("success");
-    setMessage("logout succesful");
+    dispatch(setMessage("logout successful"));
     setTimeout(() => {
-      setMessage(null);
+      dispatch(setMessage(null));
     }, 5000);
   };
 
@@ -46,50 +52,60 @@ const App = () => {
 
       window.localStorage.setItem("loggedUser", JSON.stringify(user));
       blogService.setToken(user.token);
-      setUser(user);
+      dispatch(setUser(user));
 
-      setMessageStyle("success");
-      setMessage("login successful");
+      dispatch(setMessage("login successful"));
       setTimeout(() => {
-        setMessage(null);
+        dispatch(setMessage(null));
       }, 5000);
     } catch (exception) {
-      setMessageStyle("error");
-      setMessage("Wrong username or password");
+      dispatch(setMessage("Wrong username or password"));
       setTimeout(() => {
-        setMessage(null);
+        dispatch(setMessage(null));
       }, 5000);
     }
   };
 
   const handleCreate = async (newBlog) => {
     blogFormRef.current.toggleVisibility();
-    await blogService.create(newBlog);
-    const updatedBlogs = await blogService.getAll();
-    setBlogs(updatedBlogs);
+    const response = await blogService.create(newBlog);
+    dispatch(addBlog(response))
 
-    setMessageStyle("success");
-    setMessage(`a new blog ${newBlog.title} by ${newBlog.author} added`);
+    dispatch(
+      setMessage(
+        `a new blog ${newBlog.title} by ${newBlog.author} added successfully`
+      )
+    );
     setTimeout(() => {
-      setMessage(null);
+      dispatch(setMessage(null));
     }, 5000);
   };
 
-  const handleLike = async (blog) => {
-    await blogService.incrementLike(blog);
-  };
+  const handleLike = async blog => {
+    dispatch(like(blog.id))
+    await blogService.incrementLike(blog)
+  }
 
   const handleRemove = async (blog) => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
       await blogService.remove(blog);
-      setBlogs(blogs.filter((b) => b.id !== blog.id));
+      dispatch(removeBlog(blog.id))
+
+      dispatch(
+        setMessage(
+          `${blog.title} by ${blog.author} was removed successfully`
+        )
+      );
+      setTimeout(() => {
+        dispatch(setMessage(null));
+      }, 5000);
     }
   };
 
   if (user) {
     return (
       <div>
-        <Notification message={message} style={messageStyle} />
+        <Notification />
         <h2>blogs</h2>
         <p>
           {user.name} logged in <button onClick={handleLogout}>logout</button>
@@ -97,26 +113,14 @@ const App = () => {
         <Toggleable buttonLabel="add new blog" ref={blogFormRef}>
           <BlogForm handleCreate={handleCreate} user={user} />
         </Toggleable>
-        {blogs
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              user={user}
-              blogs={blogs}
-              setBlogs={setBlogs}
-              handleRemove={handleRemove}
-              handleLike={handleLike}
-            />
-          ))}
+        <Blogs handleRemove={handleRemove} handleLike={handleLike} />
       </div>
     );
   } else {
     return (
       <div>
         <h2>log in to application</h2>
-        <Notification message={message} style={messageStyle} />
+        <Notification />
         <LoginForm handleLogin={handleLogin} />
       </div>
     );
