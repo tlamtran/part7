@@ -6,7 +6,8 @@ module.exports = {
     },
     "extends": [ 
         "eslint:recommended",
-        "plugin:react/recommended"
+        "plugin:react/recommended",
+        "prettier"
     ],
     "parserOptions": {
         "ecmaFeatures": {
@@ -19,18 +20,6 @@ module.exports = {
         "react", "jest"
     ],
     "rules": {
-        "indent": [
-            "error",
-            4  
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "never"
-        ],
         "eqeqeq": "error",
         "no-trailing-spaces": "error",
         "object-curly-spacing": [
