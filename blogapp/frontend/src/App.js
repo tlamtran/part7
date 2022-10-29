@@ -16,7 +16,7 @@ import loginService from "./services/login";
 import userServices from "./services/users";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setBlogs, addBlog, removeBlog, like } from "./reducers/blogReducer";
+import { setBlogs, addBlog, like, addComment } from "./reducers/blogReducer";
 import { setUser } from "./reducers/userReducer";
 import { setUsers } from "./reducers/usersReducer";
 import { setMessage } from "./reducers/notificationReducer";
@@ -99,7 +99,7 @@ const App = () => {
     await blogService.incrementLike(blog);
   };
 
-  const handleRemove = async (blog) => {
+  /* const handleRemove = async (blog) => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
       await blogService.remove(blog);
       dispatch(removeBlog(blog.id));
@@ -111,7 +111,11 @@ const App = () => {
         dispatch(setMessage(null));
       }, 5000);
     }
-  };
+  }; */
+
+  const handleComment = async (blog) => {
+    dispatch(addComment(blog))
+  }
 
   const Home = () => {
     return (
@@ -119,7 +123,7 @@ const App = () => {
         <Toggleable buttonLabel="add new blog" ref={blogFormRef}>
           <BlogForm handleCreate={handleCreate} user={user} />
         </Toggleable>
-        <Blogs handleRemove={handleRemove} handleLike={handleLike} />
+        <Blogs />
       </div>
     );
   };
@@ -152,7 +156,7 @@ const App = () => {
       <div>
         <Routes>
           <Route path="/users/:id" element={<User />} />
-          <Route path="/blogs/:id" element={<Blog handleLike={handleLike}/>} />
+          <Route path="/blogs/:id" element={<Blog handleLike={handleLike} handleComment={handleComment} />} />
           <Route
             path="/"
             element={user ? <Home /> : <Navigate replace to="/login" />}
