@@ -1,61 +1,38 @@
-import { useState } from "react";
-import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
-const blogStyle = {
-  paddingTop: 10,
-  paddingLeft: 2,
-  border: "solid",
-  borderWidth: 1,
-  marginBottom: 5,
-};
+const Blog = ({ handleLike }) => {
+  const blogs = useSelector((state) => state.blogs);
+  const id = useParams().id;
 
-const Blog = ({ blog, handleLike, handleRemove }) => {
-  const [visible, setVisible] = useState(false);
-
-  const showIfTrue = { display: visible ? "" : "none" };
-  const showRemoveButton = {
-    display: blog.user.name === blog.user.name ? "" : "none",
+  const incrementLike = (blog) => {
+    handleLike(blog);
   };
 
-  const toggleVisibility = () => {
-    setVisible(!visible);
-  };
-
-  const incrementLike = () => {
-    handleLike(blog)
-  };
-
-  const remove = async () => {
+  /* const remove = async () => {
     handleRemove(blog)
-  };
+  }; */
+  const blog = blogs.find((blog) => blog.id === id);
 
-  return (
-    <div style={blogStyle} className="blogContent">
+  if (!blog) {
+    return null;
+  } else {
+    return (
       <div>
-        {blog.title} {blog.author}
-        <button onClick={toggleVisibility} id="show-button">
-          {visible ? "hide" : "view"}
-        </button>
-      </div>
-      <div style={showIfTrue} className="hiddenContent">
-        <div>{blog.url}</div>
+        <h2>{blog.title}</h2>
         <div>
-          likes {blog.likes}
-          <button onClick={incrementLike} className="likeButton">
+          <a href={`//${blog.url}`}>{blog.url}</a>
+        </div>
+        <div>
+          {blog.likes} likes
+          <button onClick={() => incrementLike(blog)} className="likeButton">
             like
           </button>
         </div>
-        <div>{blog.user.name}</div>
-        <button style={showRemoveButton} onClick={remove}>
-          remove
-        </button>
+        <div>added by {blog.author}</div>
       </div>
-    </div>
-  );
-};
-
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
+    );
+  }
 };
 
 export default Blog;

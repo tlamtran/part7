@@ -1,13 +1,15 @@
 import { useEffect, useRef } from "react";
 
-import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
+import { Route, Routes, Navigate, useNavigate, Link } from "react-router-dom";
 
 import Blogs from "./components/Blogs";
+import Blog from "./components/Blog";
 import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
 import Toggleable from "./components/Toggleable";
 import Users from "./components/Users";
+import User from "./components/User";
 
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -18,7 +20,6 @@ import { setBlogs, addBlog, removeBlog, like } from "./reducers/blogReducer";
 import { setUser } from "./reducers/userReducer";
 import { setUsers } from "./reducers/usersReducer";
 import { setMessage } from "./reducers/notificationReducer";
-import User from "./components/User";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -126,10 +127,8 @@ const App = () => {
   const LoggedInInfo = () => {
     return (
       <div>
-        <h2>blogs</h2>
-        <p>
-          {user.name} logged in <button onClick={handleLogout}>logout</button>
-        </p>
+        <Link to={"/"}>blogs</Link> <Link to={"/users"}>users</Link>
+        <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
       </div>
     );
   };
@@ -148,15 +147,17 @@ const App = () => {
       <div>
         {user ? <LoggedInInfo /> : null}
         <Notification />
+        <h1>blog app</h1>
       </div>
       <div>
         <Routes>
           <Route path="/users/:id" element={<User />} />
+          <Route path="/blogs/:id" element={<Blog handleLike={handleLike}/>} />
           <Route
             path="/"
             element={user ? <Home /> : <Navigate replace to="/login" />}
           />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={!user ? <Login /> : <Navigate replace to="/" />} />
           <Route path="/users" element={<Users />} />
         </Routes>
       </div>
