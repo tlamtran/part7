@@ -147,7 +147,7 @@ const App = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       <div>
         {user ? <LoggedInInfo /> : null}
         <Notification />

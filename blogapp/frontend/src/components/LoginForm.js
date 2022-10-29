@@ -1,5 +1,5 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
+import { Form, Button } from 'react-bootstrap'
 
 const LoginForm = ({ handleLogin }) => {
   const [username, setUsername] = useState("");
@@ -18,7 +18,7 @@ const LoginForm = ({ handleLogin }) => {
 
   return (
     <div>
-      <form onSubmit={login}>
+      <Form onSubmit={login}>
         <div>
           username
           <input
@@ -37,16 +37,13 @@ const LoginForm = ({ handleLogin }) => {
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button type="submit" id="login-button">
+        <Button type="submit" id="login-button">
           login
-        </button>
-      </form>
+        </Button>
+      </Form>
     </div>
   );
 };
 
-LoginForm.propTypes = {
-  handleLogin: PropTypes.func.isRequired,
-};
 
 export default LoginForm;
